@@ -42,7 +42,7 @@ An autonomous obstacle-avoiding robot car built using an Arduino Nano. The robot
 
 ## Project Structure
 
-text
+```text
 .
 ├── docs/
 │   ├── images/
@@ -64,7 +64,7 @@ text
 ├── LICENSE
 └── .gitignore
 
-
+```
 ---
 
 ## How It Works
