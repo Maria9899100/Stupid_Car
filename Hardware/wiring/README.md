@@ -69,20 +69,21 @@ The L298N is responsible for supplying current to the motors.
 
 The HC-SR04 provides obstacle-distance information.
 
-2. Component List
+# 2. Component List
+
   | Component           |    Quantity | Purpose                        |
   | ------------------- | ----------: | ------------------------------ |
   | Arduino Nano        |           1 | Main controller                |
   | HC-SR04             |           1 | Obstacle/distance detection    |
   | L298N               |           1 | Dual DC motor driver           |
-  | DC geared motor     |           2 | car movement                 |
+  | DC geared motor     |           2 | car movement                   |
   | 18650 cell          |           2 | Battery                        |
   | 2S battery pack/BMS |           1 | Battery arrangement/protection |
   | ON/OFF switch       |           1 | Main power control             |
   | Jumper wires        | As required | Electrical connections         |
-  | car chassis       |           1 | Mechanical structure           |
+  | car chassis         |           1 | Mechanical structure           |
 
-4. HC-SR04 Ultrasonic Sensor
+# 3. HC-SR04 Ultrasonic Sensor
 
 The HC-SR04 measures the distance between the car and an obstacle.
 
@@ -131,7 +132,7 @@ The Arduino sends a trigger signal from D9.
 The Arduino measures the duration of the echo signal and calculates the
 approximate distance to the obstacle.
 
-4. Arduino Nano → L298N
+# 4. Arduino Nano → L298N
 
 The Arduino controls the L298N using six digital pins.
 
@@ -178,7 +179,7 @@ Quick pin map
   D9  → HC-SR04 TRIG
   D10 → HC-SR04 ECHO
 ```
-5. ENA and ENB — Motor Speed Control
+# 5. ENA and ENB — Motor Speed Control
 
 The L298N has two enable pins:
 ```text
@@ -216,7 +217,7 @@ The Arduino should then control ENA and ENB directly.
 If the jumpers remain installed, the module may keep the enable inputs permanently enabled,
 depending on the particular L298N module.
 
-6. IN1, IN2, IN3 and IN4 — Motor Direction
+# 6. IN1, IN2, IN3 and IN4 — Motor Direction
 
 The four input pins control motor direction.
 
@@ -241,7 +242,7 @@ Right motor control
 | HIGH | HIGH | Brake/stop* |
 
 
-7. Motors → L298N
+# 7. Motors → L298N
 
 For this project, define:
 
@@ -279,7 +280,7 @@ depending on which motor needs to be reversed.
 Do not change the Arduino pin assignment simply because a motor rotates in
 the opposite direction.
 
-8. Battery Pack
+# 8. Battery Pack
 
 The car uses two 18650 cells connected in series.
 
@@ -301,7 +302,7 @@ so a typical 2S pack can reach approximately:
 The exact battery specifications should be taken from the battery/cell
 manufacturer.
 
-9. Battery → L298N
+# 9. Battery → L298N
 
 The battery positive connection should pass through the ON/OFF switch.
 ```text
@@ -331,7 +332,7 @@ motor-driver's usable supply range for many L298N modules.
 
 Always check the specifications of the exact L298N module being used.
 
-11. Power Switch
+# 10. Power Switch
 
 The ON/OFF switch should be placed in series with the battery positive line.
 ```text
@@ -351,7 +352,7 @@ The switch therefore controls the main power supplied to the car.
 
 The battery negative should remain connected to the common ground.
 
-12. Powering the Arduino Nano
+# 11. Powering the Arduino Nano
 
 There are several possible ways to power an Arduino Nano.
 
@@ -397,7 +398,7 @@ actually provide a suitable regulated 5 V supply.
 Do not connect multiple independent 5 V sources to the Nano's 5V pin at the
 same time.
 
-13. L298N 5V Pin
+# 12. L298N 5V Pin
 
 The exact function of the 5V pin on an L298N module depends on the module's
 onboard regulator and jumper configuration.
@@ -416,7 +417,7 @@ Before making this connection:
 The motor supply and logic supply should be clearly identified in the final
 schematic.
 
-14. Common Ground
+# 13. Common Ground
 
 All components that communicate with the Arduino should share a common
 electrical ground.
@@ -436,7 +437,7 @@ The common ground provides a shared voltage reference for the control signals.
 Without a common ground, the Arduino's HIGH and LOW signals may not be
 interpreted reliably by the L298N or sensor.
 
-15. Complete Connection Tables
+# 14. Complete Connection Tables
 HC-SR04 Connections
 | HC-SR04 Pin | Signal | Arduino Nano |
 | ----------: | ------ | ------------ |
@@ -470,7 +471,7 @@ L298N Motor Connections
 | OUT3         | Right motor wire 1 |
 | OUT4         | Right motor wire 2 |
 
-16. Complete Pin Map
+# 15. Complete Pin Map
 
 For quick reference:
 ```text
@@ -498,7 +499,7 @@ POWER
 GND ──────────────── Common ground
 VIN ──────────────── Battery supply (if using VIN)
 ```
-17. Complete Power Flow
+# 16. Complete Power Flow
 
 The overall power arrangement can be represented as:
 ```text
@@ -522,7 +523,7 @@ The overall power arrangement can be represented as:
 The exact Arduino power branch depends on whether VIN or a regulated 5 V
 supply is being used.
 
-18. How the Complete System Works
+# 17. How the Complete System Works
 Step 1 — Detect an obstacle
 
 The Arduino sends a trigger signal:
@@ -553,11 +554,11 @@ Move forward
 ```
 If:
 ```text
-Distance < threshold
+Distance < Threshold
         ↓
 Obstacle detected
         ↓
-Stop / turn
+Stop/turn
 ```
 Step 3 — Control the L298N
 
@@ -590,7 +591,7 @@ L298N
    ▼
 DC Motors
 ```
-19. Example Movement Logic
+# 18. Example Movement Logic
 
 The exact movement algorithm will be implemented in software, but the basic
 movement concepts are:
@@ -616,7 +617,7 @@ Left motor  → Stop
 Right motor → Stop
 ```
 
-22. Schematic Organization
+# 19. Schematic Organization
 
 A clean schematic can be arranged like this:
 ```
@@ -663,7 +664,7 @@ A clean schematic can be arranged like this:
                               ▼
                          Motor Supply
 ```
-23. Wiring Checklist
+# 20. Wiring Checklist
 
 Before powering the car, check every connection.
 
@@ -705,7 +706,7 @@ Before powering the car, check every connection.
 - [ ] Check ENA/ENB jumper configuration
 - [ ] Verify all connections against the wiring table
       
-## 24. Important Notes
+# 21. Important Notes
 
 > [!IMPORTANT]
 > **Note 1 — Common Ground:**  
