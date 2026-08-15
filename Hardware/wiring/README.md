@@ -13,9 +13,10 @@ The car uses:
 - L298N dual H-bridge motor driver
 - 2 × DC geared motors
 - 2 × 18650 cells connected in series (2S battery pack)
-- Battery management/protection system (BMS), if included in the battery pack
 - ON/OFF switch
 - Jumper wires
+- Two plastic car wheels
+- One Caster wheel
 - Car chassis
 
 
@@ -81,7 +82,9 @@ The HC-SR04 provides obstacle-distance information.
   | 2S battery pack/BMS |           1 | Battery arrangement/protection |
   | ON/OFF switch       |           1 | Main power control             |
   | Jumper wires        | As required | Electrical connections         |
-  | car chassis         |           1 | Mechanical structure           |
+  | Car wheel           |           2 | Mechanical structure           |
+  | Castor wheel        |           1 | Mechanical structure           |
+  | Car chassis         |           1 | Mechanical structure           |
 
 # 3. HC-SR04 Ultrasonic Sensor
 
@@ -299,8 +302,6 @@ so a typical 2S pack can reach approximately:
 
 `4.2 V + 4.2 V = 8.4 V`
 
-The exact battery specifications should be taken from the battery/cell
-manufacturer.
 
 # 9. Battery → L298N
 
@@ -382,21 +383,6 @@ Battery (-)
      │
      └──────────── Arduino GND
 ```
-Option B — Regulated 5 V supply
-
-A regulated 5 V supply is another approach.
-```text
-2S Battery
-     │
-     ├────────────── L298N motor supply
-     │
-     └── Regulator ───── Arduino 5V
-```
-If a regulated 5 V source is connected directly to the Nano's 5V pin, it must
-actually provide a suitable regulated 5 V supply.
-
-Do not connect multiple independent 5 V sources to the Nano's 5V pin at the
-same time.
 
 # 12. L298N 5V Pin
 
@@ -520,8 +506,6 @@ The overall power arrangement can be represented as:
                     ▼
               DC Motors
 ```
-The exact Arduino power branch depends on whether VIN or a regulated 5 V
-supply is being used.
 
 # 17. How the Complete System Works
 Step 1 — Detect an obstacle
@@ -603,13 +587,13 @@ Right motor → Forward
 ```
 Turn left
 ```
-Left motor  → Stop / slow
+Left motor  → Stop/slow
 Right motor → Forward
 ```
 Turn right
 ```
 Left motor  → Forward
-Right motor → Stop / slow
+Right motor → Stop/slow
 ```
 Stop
 ```
@@ -624,15 +608,15 @@ A clean schematic can be arranged like this:
 ┌─────────────────────────────────────────────────────────┐
 │                    ARDUINO NANO                         │
 │                                                         │
-│  D9 ─────────────── HC-SR04 TRIG                       │
-│  D10 ────────────── HC-SR04 ECHO                       │
+│  D9 ─────────────── HC-SR04 TRIG                        │
+│  D10 ────────────── HC-SR04 ECHO                        │
 │                                                         │
-│  D5 ─────────────── L298N ENA                          │
-│  D7 ─────────────── L298N IN1                          │
-│  D8 ─────────────── L298N IN2                          │
-│  D11 ────────────── L298N IN3                          │
-│  D12 ────────────── L298N IN4                          │
-│  D6 ─────────────── L298N ENB                          │
+│  D5 ─────────────── L298N ENA                           │
+│  D7 ─────────────── L298N IN1                           │
+│  D8 ─────────────── L298N IN2                           │
+│  D11 ────────────── L298N IN3                           │
+│  D12 ────────────── L298N IN4                           │
+│  D6 ─────────────── L298N ENB                           │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 
