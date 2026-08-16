@@ -1,12 +1,9 @@
 # Arduino Nano Obstacle Avoiding Car — Wiring
 
-
 This document describes the complete electrical wiring of the Arduino Nano
 obstacle-avoiding car.
 
-
 The car uses:
-
 
 - Arduino Nano
 - HC-SR04 ultrasonic distance sensor
@@ -19,19 +16,15 @@ The car uses:
 - One Caster wheel
 - Car chassis
 
-
 The Arduino Nano reads the distance measured by the HC-SR04 and controls the
-two DC motors through the L298N motor driver.
-
+two DC motors through the L298N motor driver. The Arduino itself is powered
+directly from the same 2S battery pack, through its VIN pin.
 
 ---
 
-
 # 1. System Overview
 
-
 The complete system can be thought of as four main sections:
-
 
 ```text
                     HC-SR04
@@ -61,8 +54,9 @@ The complete system can be thought of as four main sections:
                        │
                     Switch
                        │
-                       ▼
-                    L298N
+                 ┌─────┴─────┐
+                 ▼           ▼
+              L298N      Arduino VIN
 ```
 The Arduino is responsible for the logic and decision-making.
 
@@ -70,13 +64,16 @@ The L298N is responsible for supplying current to the motors.
 
 The HC-SR04 provides obstacle-distance information.
 
+The battery pack powers both the L298N (motor supply) and the Arduino Nano
+(via VIN) directly.
+
 # 2. Component List
 
   | Component           |    Quantity | Purpose                        |
   | ------------------- | ----------: | ------------------------------ |
   | Arduino Nano        |           1 | Main controller                |
   | HC-SR04             |           1 | Obstacle/distance detection    |
-  | L298N               |           1 | Dual DC motor driver           |
+  | L298N                |           1 | Dual DC motor driver           |
   | DC geared motor     |           2 | car movement                   |
   | 18650 cell          |           2 | Battery                        |
   | 2S battery pack/BMS |           1 | Battery arrangement/protection |
@@ -302,6 +299,8 @@ so a typical 2S pack can reach approximately:
 
 `4.2 V + 4.2 V = 8.4 V`
 
+This same pack supplies both the L298N motor driver and, through the
+Arduino's VIN pin, the Arduino Nano itself.
 
 # 9. Battery → L298N
 
@@ -335,7 +334,9 @@ Always check the specifications of the exact L298N module being used.
 
 # 10. Power Switch
 
-The ON/OFF switch should be placed in series with the battery positive line.
+The ON/OFF switch should be placed in series with the battery positive line,
+ahead of both the L298N and the Arduino, so a single switch controls power to
+the whole car.
 ```text
 Battery (+)
      │
@@ -347,25 +348,20 @@ Battery (+)
      │
      ├────────── L298N motor supply
      │
-     └────────── Arduino supply
+     └────────── Arduino VIN
 ```
-The switch therefore controls the main power supplied to the car.
+The switch therefore controls the main power supplied to the car, including
+the Arduino.
 
 The battery negative should remain connected to the common ground.
 
 # 11. Powering the Arduino Nano
 
-There are several possible ways to power an Arduino Nano.
+The Arduino Nano is powered directly from the 2S 18650 battery pack, through
+its VIN pin. The battery's switched positive output is shared between the
+L298N motor supply and the Arduino VIN, and the battery negative is shared
+between the L298N GND and the Arduino GND.
 
-For this project, the power arrangement must match the exact hardware being
-used.
-
-Option A — Arduino VIN
-
-If the battery voltage is appropriate for the Nano's VIN input, the switched
-battery supply can be connected to VIN.
-
-Conceptually:
 ```text
 Battery (+)
      │
@@ -384,24 +380,39 @@ Battery (-)
      └──────────── Arduino GND
 ```
 
+Why VIN, and not 5V
+
+The Arduino Nano's VIN pin feeds the onboard voltage regulator, which steps
+the input down to a clean 5 V for the board and its logic. A 2S pack at
+roughly 7.4 V nominal (up to ~8.4 V fully charged) falls within the Nano's
+typical recommended VIN range, so it can be connected there directly.
+
+Do **not** connect the raw battery voltage to the Arduino's 5V pin — the 5V
+pin is a regulated output/input meant for an already-regulated 5 V supply,
+and feeding it 7.4–8.4 V directly can damage the board. VIN is the correct
+connection point for an unregulated battery supply.
+
 # 12. L298N 5V Pin
 
 The exact function of the 5V pin on an L298N module depends on the module's
 onboard regulator and jumper configuration.
 
-Therefore, do not assume that the L298N 5V pin should automatically be
-connected to the Arduino 5V pin.
+Because the Arduino is powered independently from the battery pack via VIN,
+it is **not necessary** to connect the L298N's 5V pin to the Arduino at all.
 
-Before making this connection:
+If you do choose to use the L298N's onboard regulator to power the Arduino's
+5V pin instead of using VIN, then:
 
   1. Check the markings on your exact L298N module.
   2. Check whether the 5V regulator jumper is installed.
   3. Check the module's documentation.
   4. Determine whether the 5V pin is an output or an input under that
   configuration.
+  5. Only connect it to the Arduino 5V pin (never VIN) if confirmed to be a
+  regulated 5 V output.
 
-The motor supply and logic supply should be clearly identified in the final
-schematic.
+For this build, the L298N 5V pin can be left unconnected, since the Arduino
+gets its power straight from the battery pack.
 
 # 13. Common Ground
 
@@ -446,8 +457,8 @@ L298N Power Connections
 | L298N Pin | Connection                                       |
 | --------- | ------------------------------------------------ |
 | +12V      | Battery positive through ON/OFF switch           |
-| GND       | Battery negative/common ground                 |
-| 5V        | Depends on module regulator/jumper configuration |
+| GND       | Battery negative/common ground                   |
+| 5V        | Not used (Arduino powered separately via VIN)    |
 
 L298N Motor Connections
 | L298N Output | Motor              |
@@ -456,6 +467,12 @@ L298N Motor Connections
 | OUT2         | Left motor wire 2  |
 | OUT3         | Right motor wire 1 |
 | OUT4         | Right motor wire 2 |
+
+Arduino Power Connections
+| Arduino Pin | Connection                              |
+| ----------- | ---------------------------------------- |
+| VIN         | Battery positive through ON/OFF switch   |
+| GND         | Battery negative/common ground           |
 
 # 15. Complete Pin Map
 
@@ -482,8 +499,8 @@ D6  ──────────────── ENB
 
 
 POWER
-GND ──────────────── Common ground
-VIN ──────────────── Battery supply (if using VIN)
+VIN ──────────────── Battery (+), through switch
+GND ──────────────── Common ground / Battery (-)
 ```
 # 16. Complete Power Flow
 
@@ -500,12 +517,15 @@ The overall power arrangement can be represented as:
                     ├──────────────┐       │
                     │              │       │
                     ▼              ▼       ▼
-                 L298N          Arduino   Common
-              Motor Supply       Supply   Ground
+                 L298N       Arduino VIN  Common
+              Motor Supply                Ground
                     │
                     ▼
               DC Motors
 ```
+The battery pack, through the switch, feeds both the L298N motor supply and
+the Arduino VIN pin in parallel, so both sections power up and shut down
+together.
 
 # 17. How the Complete System Works
 Step 1 — Detect an obstacle
@@ -608,6 +628,9 @@ A clean schematic can be arranged like this:
 ┌─────────────────────────────────────────────────────────┐
 │                    ARDUINO NANO                         │
 │                                                         │
+│  VIN ─────────────── Battery (+) through switch          │
+│  GND ─────────────── Common ground                      │
+│                                                         │
 │  D9 ─────────────── HC-SR04 TRIG                        │
 │  D10 ────────────── HC-SR04 ECHO                        │
 │                                                         │
@@ -645,8 +668,9 @@ A clean schematic can be arranged like this:
                               │
                            Switch
                               │
-                              ▼
-                         Motor Supply
+                    ┌─────────┴─────────┐
+                    ▼                   ▼
+              Motor Supply        Arduino VIN
 ```
 # 20. Wiring Checklist
 
@@ -679,8 +703,9 @@ Before powering the car, check every connection.
 
 - [ ] 2S 18650 battery pack
 - [ ] Battery positive → switch
-- [ ] Switch → L298N motor supply
-- [ ] Battery negative → common GND
+- [ ] Switch output → L298N motor supply
+- [ ] Switch output → Arduino VIN
+- [ ] Battery negative → common GND (Arduino, L298N, HC-SR04)
 
 ### Final Checks
 
@@ -688,6 +713,7 @@ Before powering the car, check every connection.
 - [ ] Check common ground
 - [ ] Check for short circuits
 - [ ] Check ENA/ENB jumper configuration
+- [ ] Confirm Arduino VIN connection (not 5V pin) from battery
 - [ ] Verify all connections against the wiring table
       
 # 21. Important Notes
@@ -719,9 +745,10 @@ Before powering the car, check every connection.
 
 > [!WARNING]
 > **Note 6 — L298N 5V:**  
-> The function of the L298N `5V` pin depends on the module's regulator and
-> jumper configuration. Verify the exact module before connecting it to
-> another 5 V supply.
+> Since the Arduino is powered directly from the battery via VIN, the L298N
+> `5V` pin is not used in this build and should be left disconnected unless
+> you specifically confirm it is a regulated 5 V output you intend to use
+> instead.
 
 > [!WARNING]
 > **Note 7 — Battery:**  
@@ -729,4 +756,10 @@ Before powering the car, check every connection.
 > approximately 8.4 V when fully charged. Use an appropriate protected/BMS
 > battery pack and compatible charging system.
 
-
+> [!IMPORTANT]
+> **Note 8 — Arduino Power via VIN:**  
+> Connect the battery's switched positive line to the Arduino's VIN pin,
+> never directly to the 5V pin. VIN feeds the onboard regulator, which
+> safely steps the ~7.4–8.4 V pack voltage down to 5 V logic power. Feeding
+> that voltage directly into 5V bypasses the regulator and can damage the
+> board.
