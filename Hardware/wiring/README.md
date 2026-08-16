@@ -1,11 +1,11 @@
-# Arduino Nano Obstacle Avoiding Car — Wiring
+# Arduino Nano V3 (ATmega328P) Obstacle Avoiding Car — Wiring
 
 This document describes the complete electrical wiring of the Arduino Nano
-obstacle-avoiding car.
+V3 (ATmega328P) obstacle-avoiding car.
 
 The car uses:
 
-- Arduino Nano
+- Arduino Nano V3 (ATmega328P)
 - HC-SR04 ultrasonic distance sensor
 - L298N dual H-bridge motor driver
 - 2 × DC geared motors
@@ -69,9 +69,9 @@ The battery pack powers both the L298N (motor supply) and the Arduino Nano
 
 # 2. Component List
 
-  | Component           |    Quantity | Purpose                        |
-  | ------------------- | ----------: | ------------------------------ |
-  | Arduino Nano        |           1 | Main controller                |
+  | Component                    |    Quantity | Purpose                        |
+  | ----------------------------- | ----------: | ------------------------------ |
+  | Arduino Nano V3 (ATmega328P) |           1 | Main controller                |
   | HC-SR04             |           1 | Obstacle/distance detection    |
   | L298N                |           1 | Dual DC motor driver           |
   | DC geared motor     |           2 | car movement                   |
@@ -82,6 +82,35 @@ The battery pack powers both the L298N (motor supply) and the Arduino Nano
   | Car wheel           |           2 | Mechanical structure           |
   | Castor wheel        |           1 | Mechanical structure           |
   | Car chassis         |           1 | Mechanical structure           |
+
+## 2.1 Arduino Nano V3 (ATmega328P) — Board Specifics
+
+The wiring in this document assumes the classic Nano V3 board built around
+the ATmega328P microcontroller. Relevant specs for this build:
+
+  | Spec                     | Value                                   |
+  | ------------------------- | --------------------------------------- |
+  | Operating logic voltage   | 5 V                                      |
+  | Recommended input voltage (VIN) | 7–12 V                            |
+  | Absolute max input voltage (VIN) | 6–20 V (avoid the extremes)       |
+  | Digital I/O pins          | D0–D13                                  |
+  | PWM-capable pins          | D3, D5, D6, D9, D10, D11                |
+  | Onboard voltage regulator | Linear (typically AMS1117 or equivalent)|
+  | Flash memory              | 32 KB (0.5 KB used by bootloader)       |
+  | Clock speed                | 16 MHz                                  |
+
+This confirms two things used elsewhere in this document:
+
+- The 2S battery pack (~7.4 V nominal, ~8.4 V full charge) sits comfortably
+  within the recommended VIN range for this board.
+- D5 and D6, used for ENA/ENB PWM speed control, are genuine PWM pins on the
+  ATmega328P Nano.
+
+> [!NOTE]
+> Some Nano V3 clones use a CH340 USB-to-serial chip and may require
+> selecting "ATmega328P (Old Bootloader)" in the Arduino IDE's board menu to
+> upload sketches successfully. This does not affect any of the wiring in
+> this document — it is a software/upload setting only.
 
 # 3. HC-SR04 Ultrasonic Sensor
 
@@ -244,14 +273,14 @@ Right motor control
 
 # 7. Motors → L298N
 
-For this project, define:
+For this project:
 
 ```text
 Motor 1 = Left motor
 Motor 2 = Right motor
 ```
 
-Connect them as follows:
+Connection goes as follows:
 ```text
 L298N                    Motor
 
@@ -394,25 +423,32 @@ connection point for an unregulated battery supply.
 
 # 12. L298N 5V Pin
 
-The exact function of the 5V pin on an L298N module depends on the module's
-onboard regulator and jumper configuration.
-
-Because the Arduino is powered independently from the battery pack via VIN,
-it is **not necessary** to connect the L298N's 5V pin to the Arduino at all.
-
-If you do choose to use the L298N's onboard regulator to power the Arduino's
-5V pin instead of using VIN, then:
-
-  1. Check the markings on your exact L298N module.
-  2. Check whether the 5V regulator jumper is installed.
-  3. Check the module's documentation.
-  4. Determine whether the 5V pin is an output or an input under that
-  configuration.
-  5. Only connect it to the Arduino 5V pin (never VIN) if confirmed to be a
-  regulated 5 V output.
-
-For this build, the L298N 5V pin can be left unconnected, since the Arduino
-gets its power straight from the battery pack.
+Most L298N breakout modules (including this build's module) have an onboard
+5V regulator, enabled or disabled by a small 2-pin jumper (often labeled
+"5V-EN") near the GND/+5V terminal:
+ 
+- **Jumper installed** → the onboard regulator is active. It steps the
+  battery/motor-supply voltage down to a regulated 5V, which powers the
+  module's own logic circuitry internally **and** makes 5V available on the
+  "+5V" terminal pin for external use.
+- **Jumper removed** → the regulator is disabled. The module's logic
+  circuitry then needs 5V supplied externally into that same terminal pin.
+**This build uses VIN to power the Arduino directly from the battery (see
+Section 11), so the L298N's 5V terminal is not used at all and should be
+left disconnected — regardless of whether the jumper is installed or not.**
+ 
+Powering the Arduino from the L298N's regulated 5V output instead of VIN is
+a valid *alternative* wiring approach some builds use, but it is not part of
+this build, and the two approaches should never be combined. If you ever
+switch to that approach:
+ 
+  1. Confirm the 5V-EN jumper is installed (regulator active).
+  2. Connect the module's "+5V" terminal to the Arduino's **5V pin**
+     — never to VIN — since it is already a regulated 5V source.
+  3. Do **not** also connect the battery to Arduino VIN at the same time,
+     to avoid two power sources fighting on the same 5V rail.
+     
+For this build specifically:  So, the L298N 5V terminal has been left unconnected, and the Arduino is being powered via VIN as already wired.
 
 # 13. Common Ground
 
@@ -763,3 +799,4 @@ Before powering the car, check every connection.
 > safely steps the ~7.4–8.4 V pack voltage down to 5 V logic power. Feeding
 > that voltage directly into 5V bypasses the regulator and can damage the
 > board.
+<img width="957" height="697" alt="image" src="https://github.com/user-attachments/assets/9e7ed213-8ad3-4111-808c-db258375a4ff" />
