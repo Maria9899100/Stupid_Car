@@ -799,4 +799,5 @@ Before powering the car, check every connection.
 > safely steps the ~7.4–8.4 V pack voltage down to 5 V logic power. Feeding
 > that voltage directly into 5V bypasses the regulator and can damage the
 > board.
-<img width="957" height="697" alt="image" src="https://github.com/user-attachments/assets/9e7ed213-8ad3-4111-808c-db258375a4ff" />
+<img width="1424" height="909" alt="image" src="https://github.com/user-attachments/assets/0a5a3726-1b54-44a1-aff9-afe678137a44" />
+
